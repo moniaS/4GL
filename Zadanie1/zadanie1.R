@@ -103,4 +103,10 @@ library(gmodels)
 CrossTable(x = testLabels, y = bayesTestPredict, prop.chisq = FALSE, prop.t = FALSE, 
            prop.r = FALSE, dnn = c('aktualne','przewidziane'))
 
+##########Drzewo decyzyjne##########
 
+library(rpart)
+
+tree_data <- rpart(data ~ nauka_przedmiot + l_powtorzen + nauka_powiaz + egz_powiaz + egz_przedmiot, method = "class", data=wiedza)
+
+printcp(tree_data)
