@@ -36,16 +36,16 @@ testLabels <- data[ind==2, 6]
 library(class)
 
 #klasyfikacja za pomoc¹ algorytmu knn
-data_pred <- knn(train = trainData, test = testData, cl = trainLabels, k=3)
+knnClassifier <- class:::knn(train = trainData, test = testData, cl = trainLabels, k=3)
 labels <- data.frame(trainLabels)
 
 #po³¹czenie `data_pred` i `testLabels` 
-merge <- data.frame(data_pred, testLabels)
+knnMerge <- data.frame(knnClassifier, testLabels)
 
-names(merge) <- c("Przewidywane rezultaty", "Oczekiwane rezultaty")
+names(knnMerge) <- c("Przewidziane", "Aktualne")
 
 #wyswietlenie tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
-CrossTable(x = testLabels, y = data_pred, prop.chisq=FALSE)
+CrossTable(x = testLabels, y = knnClassifier, prop.chisq=FALSE, dnn = c('aktualne', 'przewidziane'))
 
 #######ALGORYTM BAYESOWSKI#############
 
@@ -62,4 +62,45 @@ model = train(x, y, 'nb', trControl=trainControl(method='cv', number=10))
 
 #podsumowanie modelu
 model
+
+#######ALGORYTM BAYESOWSKI - WERSJA 2###########
+#wczytanie danych
+data <- read.csv('C:/Users/Monia/Documents/Studia/1 semestr/4GL/Zadanie1/dane.csv', header = FALSE, sep = ' ')
+
+#wyœwietlenie podsmumowania zbioru danych
+summary(data)
+
+#dziêki temu wywo³aniu mo¿na otrzymaæ powtarzalne rezultaty
+set.seed(1234)
+
+#wymieszanie danych ze zbioru
+data<- data[sample(nrow(data)),] 
+
+#podzielenie danych na 2 zbiory
+ind <- sample(2, nrow(data), replace=TRUE, prob=c(0.67, 0.33))
+
+#przypisanie danych treningowych i testowych (kolumny 1-5)
+trainData <- data[ind==1, 1:5]
+testData <- data[ind==2, 1:5]
+
+#przypisanie klas ze zbioru treningowego i testowego (kolumna 6)
+trainLabels <- data[ind==1, 6]
+testLabels <- data[ind==2, 6]
+
+#zaladowanie biblioteki
+library(e1071)
+
+#klasyfikacja za pomoc¹ algorytmu naiwnego Bayesa
+bayesClassifier = naiveBayes(trainData, trainLabels)
+
+#sprawdzenie wyników klasyfikacji
+bayesTestPredict = predict(bayesClassifier, testData)
+
+#zaladowanie biblioteki
+library(gmodels)
+
+#wyswietlenie tabelki pokazujacej rezultaty klasyfikacji
+CrossTable(x = testLabels, y = bayesTestPredict, prop.chisq = FALSE, prop.t = FALSE, 
+           prop.r = FALSE, dnn = c('aktualne','przewidziane'))
+
 
