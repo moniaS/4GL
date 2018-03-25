@@ -46,6 +46,28 @@ names(knnMerge) <- c("Przewidziane", "Aktualne")
 #wyswietlenie tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
 CrossTable(x = testLabels, y = knnClassifier, prop.chisq=FALSE, dnn = c('aktualne', 'przewidziane'))
 
+########## knn - gower ###########
+library(dprep)
+
+ind <- sample(2, nrow(data), replace=TRUE, prob=c(0.7, 0.3))
+
+training <- data[ind==1, 1:6]
+testing <- data[ind==2, 1:6]
+
+knnGowClassifier = knngow(training, testing, 3)
+
+testGowLabels <- testing [,6]
+
+knnMerge <- data.frame(knnGowClassifier, testGowLabels)
+View(knnMerge)
+
+#obie zmienne musza byc wektorami, jesli sa nie trzeba tego wykonywac
+#knnGowClassifier <- knnGowClassifier[,1]
+#testGowLabels <- testGowLabels[,1]
+
+library(gmodels)
+CrossTable(x = testGowLabels, y = knnGowClassifier, prop.chisq=FALSE, dnn = c('aktualne', 'przewidziane'))
+
 #######ALGORYTM BAYESOWSKI#############
 
 #nalezy pobrac odpowiednie biblioteki
