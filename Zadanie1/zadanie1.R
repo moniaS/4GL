@@ -19,7 +19,7 @@ set.seed(12345)
 data<- data[sample(nrow(data)),] 
 
 #podzielenie danych na 2 zbiory
-train.index <- sample(1:nrow(data), 0.8 * nrow(data))
+train.index <- sample(1:nrow(data), 0.7 * nrow(data))
 test.index <- setdiff(1:nrow(data), train.index)
 
 #przypisanie danych treningowych i testowych (kolumny 1-5)
