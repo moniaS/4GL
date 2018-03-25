@@ -13,24 +13,26 @@ head(data)
 summary(data)
 
 #dzieki temu wywo³aniu mozna otrzymac powtarzalne rezultaty
-set.seed(1234)
+set.seed(12345)
 
 #wymieszanie danych ze zbioru
 data<- data[sample(nrow(data)),] 
 
 #podzielenie danych na 2 zbiory
-ind <- sample(2, nrow(data), replace=TRUE, prob=c(0.7, 0.3))
+train.index <- sample(1:nrow(data), 0.8 * nrow(data))
+test.index <- setdiff(1:nrow(data), train.index)
 
 #przypisanie danych treningowych i testowych (kolumny 1-5)
-train.data <- data[ind == 1, 1:5]
-test.data <- data[ind == 2, 1:5]
+train.data <- data[train.index, 1:5]
+test.data <- data[test.index, 1:5]
 
 #przypisanie klas ze zbioru treningowego i testowego (kolumna 6)
-train.labels <- data[ind == 1, 6]
-test.labels <- data[ind == 2, 6]
+train.labels <- data[train.index, 6]
+test.labels <- data[test.index, 6]
 
 #przypisanie danych treningowych z klasami
-train.data.labels <- data[ind == 1, 1:6]
+train.data.labels <- data[test.index, 1:6]
+
 
 ######### ALGORYTM KNN - MIARA EUKLIDESOWA #############
 
