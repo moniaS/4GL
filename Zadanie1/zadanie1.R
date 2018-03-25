@@ -1,4 +1,4 @@
-#########ALGORYTM KNN#############
+######### PRZYGOTOWANIE DANYCH ##########
 
 #wczytanie danych
 data <- read.csv('C:/Users/Monia/Documents/Studia/1 semestr/4GL/Zadanie1/dane.csv', header = FALSE, sep = ' ')
@@ -9,13 +9,10 @@ names(data) <- c("nauka_przedmiot", "l_powtorzen", "nauka_powiaz", "egz_powiaz",
 #wyswietlenie pierwszych pozycji zbioru
 head(data)
 
-#wyœwietlenie podsmumowania zbioru danych
+#wyswietlenie podsumowania zbioru danych
 summary(data)
 
-#wyswietlenie wykresu prezentuj¹cego poziom wiedzy w zaleznosci od wyniku egzaminow
-data %>% ggvis(~egz_powiaz, ~egz_przedmiot, fill = ~wiedza) %>% layer_points()
-
-#dziêki temu wywo³aniu mozna otrzymac powtarzalne rezultaty
+#dzieki temu wywo³aniu mozna otrzymac powtarzalne rezultaty
 set.seed(1234)
 
 #wymieszanie danych ze zbioru
@@ -25,162 +22,103 @@ data<- data[sample(nrow(data)),]
 ind <- sample(2, nrow(data), replace=TRUE, prob=c(0.7, 0.3))
 
 #przypisanie danych treningowych i testowych (kolumny 1-5)
-trainData <- data[ind==1, 1:5]
-testData <- data[ind==2, 1:5]
+train.data <- data[ind == 1, 1:5]
+test.data <- data[ind == 2, 1:5]
 
 #przypisanie klas ze zbioru treningowego i testowego (kolumna 6)
-trainLabels <- data[ind==1, 6]
-testLabels <- data[ind==2, 6]
+train.labels <- data[ind == 1, 6]
+test.labels <- data[ind == 2, 6]
 
-#za³adowanie biblioteki class
+#przypisanie danych treningowych z klasami
+train.data.labels <- data[ind == 1, 1:6]
+
+######### ALGORYTM KNN - MIARA EUKLIDESOWA #############
+
+#zaladowanie biblioteki do algorytmu knn z miara euklidesowa
 library(class)
 
-#klasyfikacja za pomoc¹ algorytmu knn
-knnClassifier <- class:::knn(train = trainData, test = testData, cl = trainLabels, k=3)
-labels <- data.frame(trainLabels)
+#za³adowanie biblioteki do tworzenia CrossTable
+library(gmodels)
 
-#po³¹czenie 'knnClassifier` i `testLabels` 
-knnMerge <- data.frame(knnClassifier, testLabels)
-names(knnMerge) <- c("Przewidziane", "Aktualne")
+#wyswietlenie wykresu prezentuj¹cego poziom wiedzy w zaleznosci od wyniku egzaminow
+data %>% ggvis(~egz_powiaz, ~egz_przedmiot, fill = ~wiedza) %>% layer_points()
+
+#klasyfikacja za pomoca algorytmu knn, miara euklidesowa, k = 3
+knn.predict.euclides <- knn(train = train.data, test = test.data, cl = train.labels, k = 3)
+
+#polaczenie `test.labels` i 'knn.predict.euclides`
+knn.merge.euclides <- data.frame(test.labels, knn.predict.euclides)
+names(knn.merge.euclides) <- c("Aktualne", "Przewidziane")
 
 #wyswietlenie tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
-CrossTable(x = testLabels, y = knnClassifier, prop.chisq=FALSE, dnn = c('aktualne', 'przewidziane'))
+CrossTable(x = test.labels, y = knn.predict.euclides, prop.chisq = FALSE, dnn = c('aktualne', 'przewidziane'))
 
-########## knn - gower ###########
+######### ALGORYTM KNN - MIARA GOWERA #############
+
+#zaladowanie biblioteki do algorytmu knn z miara Gowera
 library(dprep)
 
-ind <- sample(2, nrow(data), replace=TRUE, prob=c(0.7, 0.3))
+#za³adowanie biblioteki do tworzenia CrossTable
+library(gmodels)
 
-training <- data[ind==1, 1:6]
-testing <- data[ind==2, 1:6]
+#klasyfikacja za pomoc¹ algorytmu knn, miara Gowera, k = 3
+knn.predict.gower = knngow(train.data.labels, test.data, 3)
 
-knnGowClassifier = knngow(training, testing, 3)
-
-testGowLabels <- testing [,6]
-
-knnMerge <- data.frame(knnGowClassifier, testGowLabels)
-View(knnMerge)
+#polaczenie `test.labels` i 'knn.predict.gower`
+knn.merge.gower <- data.frame(test.labels, knn.predict.gower)
+names(knn.merge.gower) <- c("Aktualne", "Przewidziane")
 
 #obie zmienne musza byc wektorami, jesli sa nie trzeba tego wykonywac
 #knnGowClassifier <- knnGowClassifier[,1]
 #testGowLabels <- testGowLabels[,1]
 
-library(gmodels)
-CrossTable(x = testGowLabels, y = knnGowClassifier, prop.chisq=FALSE, dnn = c('aktualne', 'przewidziane'))
+#wyswietlenie tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
+CrossTable(x = test.labels, y = knn.predict.gower, prop.chisq = FALSE, dnn = c('aktualne', 'przewidziane'))
 
-#######ALGORYTM BAYESOWSKI#############
+####### ALGORYTM BAYESOWSKI ########### 
 
-#nalezy pobrac odpowiednie biblioteki
-library(e1071)
-library(caret)
-
-#przypisanie wartosci z kolumn 1-5 do x i klasy do y
-x=data[,-6]
-y=data$wiedza
-
-#stworzenie modelu, cross validation=10
-model = train(x, y, 'nb', trControl=trainControl(method='cv', number=10))
-
-#podsumowanie modelu
-model
-
-#######ALGORYTM BAYESOWSKI - WERSJA 2###########
-#wczytanie danych
-data <- read.csv('C:/Users/Monia/Documents/Studia/1 semestr/4GL/Zadanie1/dane.csv', header = FALSE, sep = ' ')
-
-#wyœwietlenie podsmumowania zbioru danych
-summary(data)
-
-#dziêki temu wywo³aniu mo¿na otrzymaæ powtarzalne rezultaty
-set.seed(1234)
-
-#wymieszanie danych ze zbioru
-data<- data[sample(nrow(data)),] 
-
-#podzielenie danych na 2 zbiory
-ind <- sample(2, nrow(data), replace=TRUE, prob=c(0.67, 0.33))
-
-#przypisanie danych treningowych i testowych (kolumny 1-5)
-trainData <- data[ind==1, 1:5]
-testData <- data[ind==2, 1:5]
-
-#przypisanie klas ze zbioru treningowego i testowego (kolumna 6)
-trainLabels <- data[ind==1, 6]
-testLabels <- data[ind==2, 6]
-
-#zaladowanie biblioteki
+#zaladowanie biblioteki do algorytmu bayesowskiego
 library(e1071)
 
-#klasyfikacja za pomoc¹ algorytmu naiwnego Bayesa
-bayesClassifier = naiveBayes(trainData, trainLabels)
-
-#sprawdzenie wyników klasyfikacji
-bayesTestPredict = predict(bayesClassifier, testData)
-
-#zaladowanie biblioteki
+#zaladowanie biblioteki do tabeli CrossTable
 library(gmodels)
 
-#wyswietlenie tabelki pokazujacej rezultaty klasyfikacji
-CrossTable(x = testLabels, y = bayesTestPredict, prop.chisq = FALSE, prop.t = FALSE, 
-           prop.r = FALSE, dnn = c('aktualne','przewidziane'))
+#klasyfikacja za pomoca algorytmu naiwnego Bayesa
+bayes.classifier = naiveBayes(train.data, train.labels)
 
-##########Drzewo decyzyjne##########
+#sprawdzenie wynikow klasyfikacji
+bayes.predict = predict(bayes.classifier, test.data)
 
-library(rpart)
+#polaczenie 'test.labels' i 'bayes.predict'
+bayes.merge = data.frame(test.labels, bayes.predict)
+names(bayes.merge) <- c("Aktualne", "Przewidziane")
 
-tree_data <- rpart(data ~ nauka_przedmiot + l_powtorzen + nauka_powiaz + egz_powiaz + egz_przedmiot, method = "class", data=wiedza)
+#wyswietlenie tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
+CrossTable(x = test.labels, y = bayes.predict, prop.chisq = FALSE, dnn = c('aktualne','przewidziane'))
 
-printcp(tree_data)
-
-##########Drzewo decyzyjne - 2##########
-#wczytanie danych
-data <- read.csv('C:/Users/Monia/Documents/Studia/1 semestr/4GL/Zadanie1/dane.csv', header = FALSE, sep = ' ')
-
-#przypisanie nazw kolumnom
-names(data) <- c("nauka_przedmiot", "l_powtorzen", "nauka_powiaz", "egz_powiaz", "egz_przedmiot", "wiedza")
-
-#wyœwietlenie podsmumowania zbioru danych
-summary(data)
-
-#dziêki temu wywo³aniu mo¿na otrzymaæ powtarzalne rezultaty
-set.seed(1234)
-
-#wymieszanie danych ze zbioru
-data<- data[sample(nrow(data)),] 
-
-#podzielenie danych na 2 zbiory
-ind <- sample(2, nrow(data), replace=TRUE, prob=c(0.67, 0.33))
-
-#przypisanie danych treningowych i testowych
-trainDataLabels <- data[ind==1, 1:6]
-testData <- data[ind==2, 1:5]
-
-#przypisanie klas ze zbioru treningowego i testowego (kolumna 6)
-trainLabels <- data[ind==1, 6]
-testLabels <- data[ind==2, 6]
+########## DRZEWO DECYZYJNE ##########
 
 #zaladowanie biblioteki do tworzenia modelu drzewa decyzyjnego
 library(rpart)
 
-#budowanie drzewa decyzyjnego
-decisionTree <- rpart(wiedza ~ nauka_przedmiot + l_powtorzen + nauka_powiaz + egz_powiaz + egz_przedmiot, data = trainDataLabels, method = "class")
-
-#za³adowanie biblioteki do rysowania drzewa decyzyjnego
+#zaladowanie biblioteki do rysowania drzewa decyzyjnego
 library(rattle)
 
-#tworzenie diagramu drzewa decyzyjnego
-fancyRpartPlot(decisionTree)
-
-#klasyfikacja za pomoc¹ drzewa decyzyjnego
-decisionTreePredict <- predict(decisionTree, testData, type = "class")
-
-#po³¹czenie 'decisionTreePredict' i 'testLabels'
-decisionTreeMerge <- data.frame(decisionTreePredict, testLabels)
-names(decisionTreeMerge) <- c("Przewidziane", "Aktualne")
-
-#za³adowanie biblioteki
+#zaladowanie biblioteki do tabeli CrossTable
 library(gmodels)
 
-#wyswietlenie tabelki pokazujacej rezultaty klasyfikacji
-CrossTable(x = testLabels, y = decisionTreePredict, prop.chisq = FALSE, prop.t = FALSE, 
-           prop.r = FALSE, dnn = c('aktualne','przewidziane'))
+#budowanie drzewa decyzyjnego
+decision.tree.model <- rpart(wiedza ~ nauka_przedmiot + l_powtorzen + nauka_powiaz + egz_powiaz + egz_przedmiot, data = train.data.labels, method = "class")
+
+#tworzenie diagramu drzewa decyzyjnego
+fancyRpartPlot(decision.tree.model)
+
+#klasyfikacja za pomoca drzewa decyzyjnego
+decision.tree.predict <- predict(decision.tree.model, test.data, type = "class")
+
+#polaczenie 'test.labels' i 'decision.tree.predict'
+decision.tree.merge <- data.frame(test.labels, decision.tree.predict)
+names(decision.tree.merge) <- c("Aktualne", "Przewidziane")
+
+#wyswietlenie tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
+CrossTable(x = test.labels, y = decision.tree.predict, prop.chisq = FALSE, dnn = c('aktualne','przewidziane'))
