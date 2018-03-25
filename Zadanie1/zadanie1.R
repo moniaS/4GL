@@ -39,9 +39,8 @@ library(class)
 knnClassifier <- class:::knn(train = trainData, test = testData, cl = trainLabels, k=3)
 labels <- data.frame(trainLabels)
 
-#po³¹czenie `data_pred` i `testLabels` 
+#po³¹czenie 'knnClassifier` i `testLabels` 
 knnMerge <- data.frame(knnClassifier, testLabels)
-
 names(knnMerge) <- c("Przewidziane", "Aktualne")
 
 #wyswietlenie tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
@@ -110,3 +109,56 @@ library(rpart)
 tree_data <- rpart(data ~ nauka_przedmiot + l_powtorzen + nauka_powiaz + egz_powiaz + egz_przedmiot, method = "class", data=wiedza)
 
 printcp(tree_data)
+
+##########Drzewo decyzyjne - 2##########
+#wczytanie danych
+data <- read.csv('C:/Users/Monia/Documents/Studia/1 semestr/4GL/Zadanie1/dane.csv', header = FALSE, sep = ' ')
+
+#przypisanie nazw kolumnom
+names(data) <- c("nauka_przedmiot", "l_powtorzen", "nauka_powiaz", "egz_powiaz", "egz_przedmiot", "wiedza")
+
+#wyœwietlenie podsmumowania zbioru danych
+summary(data)
+
+#dziêki temu wywo³aniu mo¿na otrzymaæ powtarzalne rezultaty
+set.seed(1234)
+
+#wymieszanie danych ze zbioru
+data<- data[sample(nrow(data)),] 
+
+#podzielenie danych na 2 zbiory
+ind <- sample(2, nrow(data), replace=TRUE, prob=c(0.67, 0.33))
+
+#przypisanie danych treningowych i testowych
+trainDataLabels <- data[ind==1, 1:6]
+testData <- data[ind==2, 1:5]
+
+#przypisanie klas ze zbioru treningowego i testowego (kolumna 6)
+trainLabels <- data[ind==1, 6]
+testLabels <- data[ind==2, 6]
+
+#zaladowanie biblioteki do tworzenia modelu drzewa decyzyjnego
+library(rpart)
+
+#budowanie drzewa decyzyjnego
+decisionTree <- rpart(wiedza ~ nauka_przedmiot + l_powtorzen + nauka_powiaz + egz_powiaz + egz_przedmiot, data = trainDataLabels, method = "class")
+
+#za³adowanie biblioteki do rysowania drzewa decyzyjnego
+library(rattle)
+
+#tworzenie diagramu drzewa decyzyjnego
+fancyRpartPlot(decisionTree)
+
+#klasyfikacja za pomoc¹ drzewa decyzyjnego
+decisionTreePredict <- predict(decisionTree, testData, type = "class")
+
+#po³¹czenie 'decisionTreePredict' i 'testLabels'
+decisionTreeMerge <- data.frame(decisionTreePredict, testLabels)
+names(decisionTreeMerge) <- c("Przewidziane", "Aktualne")
+
+#za³adowanie biblioteki
+library(gmodels)
+
+#wyswietlenie tabelki pokazujacej rezultaty klasyfikacji
+CrossTable(x = testLabels, y = decisionTreePredict, prop.chisq = FALSE, prop.t = FALSE, 
+           prop.r = FALSE, dnn = c('aktualne','przewidziane'))
