@@ -124,3 +124,8 @@ names(decision.tree.merge) <- c("Aktualne", "Przewidziane")
 
 #wyswietlenie tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
 CrossTable(x = test.labels, y = decision.tree.predict, prop.chisq = FALSE, dnn = c('aktualne','przewidziane'))
+
+################ Dodawanie danych #################
+
+#dodanie danych do test.data
+test.data <- rbind(test.data, c(2, 3, 4,5))
