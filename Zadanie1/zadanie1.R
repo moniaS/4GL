@@ -6,14 +6,8 @@ data <- read.csv('C:/Users/Monia/Documents/Studia/1 semestr/4GL/Zadanie1/dane.cs
 #przypisanie nazw kolumnom
 names(data) <- c("nauka_przedmiot", "l_powtorzen", "nauka_powiaz", "egz_powiaz", "egz_przedmiot", "wiedza")
 
-#wyswietlenie pierwszych pozycji zbioru
-head(data)
-
-#wyswietlenie podsumowania zbioru danych
-summary(data)
-
 #dzieki temu wywo³aniu mozna otrzymac powtarzalne rezultaty
-set.seed(12345)
+set.seed(1234)
 
 #wymieszanie danych ze zbioru
 data<- data[sample(nrow(data)),] 
@@ -33,6 +27,15 @@ test.labels <- data[test.index, 6]
 #przypisanie danych treningowych z klasami
 train.data.labels <- data[test.index, 1:6]
 
+#za³adowanie biblioteki do tworzenia wykresu
+library(ggvis)
+
+#wyswietlenie wykresu prezentuj¹cego poziom wiedzy w zaleznosci od nauka_przedmiot i nauka_powiaz
+data %>% ggvis(~nauka_przedmiot, ~nauka_powiaz, fill = ~wiedza) %>% layer_points()
+
+#wyswietlenie wykresu prezentuj¹cego poziom wiedzy w zaleznosci od egz_powiaz i egz_przedmiot
+data %>% ggvis(~egz_powiaz, ~egz_przedmiot, fill = ~wiedza) %>% layer_points()
+
 ######### DEFINICJA FUNKCJI WYŒWIETLAJ¥CEJ WYKRES S£UPKOWY ##########
 
 showClassificationResults <- function(prediction, expected){
@@ -47,7 +50,8 @@ showClassificationResults <- function(prediction, expected){
   barplot(as.matrix(list),
           main = "Wyniki klasyfikacji ka¿dej z klas",
           xlab = "Klasa",
-          col = c("green", "red")
+          col = c("green", "red"),
+          ylim=c(0, 40)
   )
   legend("topright",
          c("Poprawne","Niepoprawne"),
@@ -63,18 +67,11 @@ library(class)
 #za³adowanie biblioteki do tworzenia CrossTable
 library(gmodels)
 
-#wyswietlenie wykresu prezentuj¹cego poziom wiedzy w zaleznosci od wyniku egzaminow
-data %>% ggvis(~egz_powiaz, ~egz_przedmiot, fill = ~wiedza) %>% layer_points()
-
 #klasyfikacja za pomoca algorytmu knn, miara euklidesowa, k = 3
 knn.predict.euclides <- knn(train = train.data, test = test.data, cl = train.labels, k = 3)
 
-#polaczenie `test.labels` i 'knn.predict.euclides`
-knn.merge.euclides <- data.frame(test.labels, knn.predict.euclides)
-names(knn.merge.euclides) <- c("Aktualne", "Przewidziane")
-
-#wyswietlenie tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
-CrossTable(x = test.labels, y = knn.predict.euclides, prop.chisq = FALSE, dnn = c('aktualne', 'przewidziane'))
+#wyswietlenie uproszczonej tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
+table(x = knn.predict.euclides, y = test.labels, dnn = c('Przewidziane', 'Aktualne'))
 
 #wyswietlenie wykresu slupkowego z rezultatami klasyfikacji
 showClassificationResults(knn.predict.euclides, test.labels)
@@ -88,18 +85,10 @@ library(dprep)
 library(gmodels)
 
 #klasyfikacja za pomoc¹ algorytmu knn, miara Gowera, k = 3
-knn.predict.gower = knngow(train.data.labels, test.data, 3)
+knn.predict.gower = knngow(train.data.labels, test.data, 19)
 
-#polaczenie `test.labels` i 'knn.predict.gower`
-knn.merge.gower <- data.frame(test.labels, knn.predict.gower)
-names(knn.merge.gower) <- c("Aktualne", "Przewidziane")
-
-#obie zmienne musza byc wektorami, jesli sa nie trzeba tego wykonywac
-#knnGowClassifier <- knnGowClassifier[,1]
-#testGowLabels <- testGowLabels[,1]
-
-#wyswietlenie tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
-CrossTable(x = test.labels, y = knn.predict.gower, prop.chisq = FALSE, dnn = c('aktualne', 'przewidziane'))
+#wyswietlenie uproszczonej tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
+table(x = knn.predict.gower, y = test.labels, dnn = c('Przewidziane', 'Aktualne'))
 
 #wyswietlenie wykresu slupkowego z rezultatami klasyfikacji
 showClassificationResults(knn.predict.gower, test.labels)
@@ -118,12 +107,8 @@ bayes.classifier = naiveBayes(train.data, train.labels)
 #sprawdzenie wynikow klasyfikacji
 bayes.predict = predict(bayes.classifier, test.data)
 
-#polaczenie 'test.labels' i 'bayes.predict'
-bayes.merge = data.frame(test.labels, bayes.predict)
-names(bayes.merge) <- c("Aktualne", "Przewidziane")
-
 #wyswietlenie tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
-CrossTable(x = test.labels, y = bayes.predict, prop.chisq = FALSE, dnn = c('aktualne','przewidziane'))
+CrossTable(x = bayes.predict, y = test.labels,  prop.chisq = FALSE, dnn = c('przewidziane','aktualne'))
 
 #wyswietlenie wykresu slupkowego z rezultatami klasyfikacji
 showClassificationResults(bayes.predict, test.labels)
@@ -148,12 +133,8 @@ fancyRpartPlot(decision.tree.model)
 #klasyfikacja za pomoca drzewa decyzyjnego
 decision.tree.predict <- predict(decision.tree.model, test.data, type = "class")
 
-#polaczenie 'test.labels' i 'decision.tree.predict'
-decision.tree.merge <- data.frame(test.labels, decision.tree.predict)
-names(decision.tree.merge) <- c("Aktualne", "Przewidziane")
-
 #wyswietlenie tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
-CrossTable(x = test.labels, y = decision.tree.predict, prop.chisq = FALSE, dnn = c('aktualne','przewidziane'))
+CrossTable(y = test.labels, x = decision.tree.predict, prop.chisq = FALSE, dnn = c('przewidziane', 'aktualne'))
 
 #wyswietlenie wykresu slupkowego z rezultatami klasyfikacji
 showClassificationResults(decision.tree.predict, test.labels)
