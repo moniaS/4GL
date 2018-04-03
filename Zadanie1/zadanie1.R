@@ -33,6 +33,27 @@ test.labels <- data[test.index, 6]
 #przypisanie danych treningowych z klasami
 train.data.labels <- data[test.index, 1:6]
 
+######### DEFINICJA FUNKCJI WYŒWIETLAJ¥CEJ WYKRES S£UPKOWY ##########
+
+showClassificationResults <- function(prediction, expected){
+  results <- table(prediction, expected, dnn = c("przewidziane", "oczekiwane"))
+  data.frame(results)
+  correctly.classified = diag(results) # liczba poprawnie przyporzadkowanych instancji dla kazdej klasy
+  predictions = apply(results, 1, sum) # liczba wykonanych klasyfikacji
+  incorrectly.classified = predictions - correctly.classified # liczba niepoprawnie przyporzadkowanych instancji dla kazdej klasy
+  list <- list()
+  list <- rbind(list, correctly.classified)
+  list <- rbind(list, incorrectly.classified)
+  barplot(as.matrix(list),
+          main = "Wyniki klasyfikacji ka¿dej z klas",
+          xlab = "Klasa",
+          col = c("green", "red")
+  )
+  legend("topright",
+         c("Poprawne","Niepoprawne"),
+         fill = c("green", "red")
+  )
+}
 
 ######### ALGORYTM KNN - MIARA EUKLIDESOWA #############
 
@@ -54,6 +75,9 @@ names(knn.merge.euclides) <- c("Aktualne", "Przewidziane")
 
 #wyswietlenie tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
 CrossTable(x = test.labels, y = knn.predict.euclides, prop.chisq = FALSE, dnn = c('aktualne', 'przewidziane'))
+
+#wyswietlenie wykresu slupkowego z rezultatami klasyfikacji
+showClassificationResults(knn.predict.euclides, test.labels)
 
 ######### ALGORYTM KNN - MIARA GOWERA #############
 
@@ -77,6 +101,9 @@ names(knn.merge.gower) <- c("Aktualne", "Przewidziane")
 #wyswietlenie tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
 CrossTable(x = test.labels, y = knn.predict.gower, prop.chisq = FALSE, dnn = c('aktualne', 'przewidziane'))
 
+#wyswietlenie wykresu slupkowego z rezultatami klasyfikacji
+showClassificationResults(knn.predict.gower, test.labels)
+
 ####### ALGORYTM BAYESOWSKI ########### 
 
 #zaladowanie biblioteki do algorytmu bayesowskiego
@@ -97,6 +124,9 @@ names(bayes.merge) <- c("Aktualne", "Przewidziane")
 
 #wyswietlenie tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
 CrossTable(x = test.labels, y = bayes.predict, prop.chisq = FALSE, dnn = c('aktualne','przewidziane'))
+
+#wyswietlenie wykresu slupkowego z rezultatami klasyfikacji
+showClassificationResults(bayes.predict, test.labels)
 
 ########## DRZEWO DECYZYJNE ##########
 
@@ -124,6 +154,9 @@ names(decision.tree.merge) <- c("Aktualne", "Przewidziane")
 
 #wyswietlenie tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
 CrossTable(x = test.labels, y = decision.tree.predict, prop.chisq = FALSE, dnn = c('aktualne','przewidziane'))
+
+#wyswietlenie wykresu slupkowego z rezultatami klasyfikacji
+showClassificationResults(decision.tree.predict, test.labels)
 
 ################ Dodawanie danych #################
 
