@@ -150,3 +150,14 @@ library(dbscan)
 data.lof <- lof(test[4], 3)
 
 data.frame(data.lof)
+
+#przygotowanie danych
+library(Rlof)
+
+df <- data[1:5]
+df$nauka_przedmiot <- as.numeric(df$nauka_przedmiot)
+df$nauka_powiaz <- as.numeric(df$nauka_powiaz)
+df$egz_powiaz <- as.numeric(df$egz_powiaz)
+df$egz_przedmiot <- as.numeric(df$egz_przedmiot)
+df$l_powtorzen <- as.numeric(df$l_powtorzen)
+data.lof <- lof(df, 3)
