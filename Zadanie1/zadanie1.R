@@ -112,17 +112,17 @@ showClassificationResults(bayes.predict, test.labels)
 
 ########## DRZEWO DECYZYJNE ##########
 
-#zaladowanie biblioteki do tworzenia modelu drzewa decyzyjnego
-library(rpart)
-
 #zaladowanie biblioteki do rysowania drzewa decyzyjnego
 library(rattle)
 
 #zaladowanie biblioteki do tabeli CrossTable
 library(gmodels)
 
+#zaladowanie biblioteki do tworzenia modelu drzewa decyzyjnego
+library(rpart)
+
 #budowanie drzewa decyzyjnego
-decision.tree.model <- rpart(wiedza ~ nauka_przedmiot + l_powtorzen + nauka_powiaz + egz_powiaz + egz_przedmiot, data = train.data.labels, method = "class")
+decision.tree.model <- rpart(wiedza ~., data = train.data.labels, method = "class")
 
 #tworzenie diagramu drzewa decyzyjnego
 fancyRpartPlot(decision.tree.model)
@@ -145,8 +145,15 @@ data <- rbind(data, c(0.1, 0.4, 0.3, 2.5,  4, "very_low"))
 data <- rbind(data, c(0.2, 0.3, 0.5, 3,  6, "very_low"))
 data <- rbind(data, c(0.8, 0.9, 0.7, 1.1,  2, "very_low"))
 
+################ Algorytm LOF #################
+library(Rlof)
 
-library(dbscan)
-data.lof <- lof(test[4], 3)
+#data$nauka_przedmiot <- as.numeric(data$nauka_przedmiot)
+#data$nauka_powiaz <- as.numeric(data$nauka_powiaz)
+data$egz_powiaz <- as.numeric(data$egz_powiaz)
+data$egz_przedmiot <- as.numeric(data$egz_przedmiot)
+#data$l_powtorzen <- as.numeric(data$l_powtorzen)
 
-data.frame(data.lof)
+results_lof <- lof(data[4:5], 10)
+
+plot(results_lof, pch=19, xlab="Indeks", ylab="Wyniki algorytmu lof", col="blue")
