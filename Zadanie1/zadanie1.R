@@ -6,9 +6,6 @@ data <- read.csv('C:/Users/Monia/Documents/Studia/1 semestr/4GL/Zadanie1/dane.cs
 #przypisanie nazw kolumnom
 names(data) <- c("nauka_przedmiot", "l_powtorzen", "nauka_powiaz", "egz_powiaz", "egz_przedmiot", "wiedza")
 
-#dzieki temu wywo³aniu mozna otrzymac powtarzalne rezultaty
-set.seed(1234)
-
 #wymieszanie danych ze zbioru
 data<- data[sample(nrow(data)),] 
 
@@ -68,7 +65,7 @@ library(class)
 library(gmodels)
 
 #klasyfikacja za pomoca algorytmu knn, miara euklidesowa, k = 3
-knn.predict.euclides <- knn(train = train.data, test = test.data, cl = train.labels, k = 3)
+knn.predict.euclides <- knn(train = train.data, test = test.data, cl = train.labels, k =5)
 
 #wyswietlenie uproszczonej tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
 table(x = knn.predict.euclides, y = test.labels, dnn = c('Przewidziane', 'Aktualne'))
@@ -85,7 +82,7 @@ library(dprep)
 library(gmodels)
 
 #klasyfikacja za pomoc¹ algorytmu knn, miara Gowera, k = 3
-knn.predict.gower = knngow(train.data.labels, test.data, 19)
+knn.predict.gower = knngow(train.data.labels, test.data, 7)
 
 #wyswietlenie uproszczonej tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
 table(x = knn.predict.gower, y = test.labels, dnn = c('Przewidziane', 'Aktualne'))
@@ -105,7 +102,7 @@ library(gmodels)
 bayes.classifier = naiveBayes(train.data, train.labels)
 
 #sprawdzenie wynikow klasyfikacji
-bayes.predict = predict(bayes.classifier, test.data)
+bayes.predict = predict(bayes.classifier, as.matrix.data.frame(test.data))
 
 #wyswietlenie tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
 CrossTable(x = bayes.predict, y = test.labels,  prop.chisq = FALSE, dnn = c('przewidziane','aktualne'))
@@ -141,5 +138,15 @@ showClassificationResults(decision.tree.predict, test.labels)
 
 ################ Dodawanie danych #################
 
-#dodanie danych do test.data
-test.data <- rbind(test.data, c(2, 3, 4,5))
+#dodanie niepasuj¹cych rekordow do zbioru danych
+data <- rbind(data, c(0.5, 0.5, 0.5, 2,  5, "very_low"))
+data <- rbind(data, c(0.5, 0.5, 0.5, 1.5,  3, "very_low"))
+data <- rbind(data, c(0.1, 0.4, 0.3, 2.5,  4, "very_low"))
+data <- rbind(data, c(0.2, 0.3, 0.5, 3,  6, "very_low"))
+data <- rbind(data, c(0.8, 0.9, 0.7, 1.1,  2, "very_low"))
+
+
+library(dbscan)
+data.lof <- lof(test[4], 3)
+
+data.frame(data.lof)
