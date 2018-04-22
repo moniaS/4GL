@@ -11,6 +11,8 @@ set.seed(20)
 ######## ZALADOWANIE PAKIETOW ##########
 install.packages("dbscan")
 library(dbscan)
+install.packages("cluster")
+library(cluster)
 
 ######## ALGORYTM K-SREDNICH ###########
 cluster.kmeans <- kmeans(data, 4)
@@ -22,3 +24,12 @@ kNNdistplot(data)
 cluster.dbcan <- dbscan(data, eps = 0.1, minPts = 5)
 cluster.dbcan
 plot(data, pch = 19, col = cluster.dbcan$cluster + 1L)
+
+######## ALGORYTM HIERARCHICZNY 
+#inne metody: average, single, complete
+cluster.agnes = agnes(data, method="average")
+plot(cluster.agnes, main="Dendogram")
+
+#wyœwietlanie danych z podzia³em na grupy
+groups<-cutree(cluster.agnes, k=4)
+rect.hclust(cluster.agnes, k=4, border="red")
