@@ -1,7 +1,7 @@
 ######### PRZYGOTOWANIE DANYCH ##########
 
 #wczytanie danych
-data <- read.csv('C:/Users/Monia/Documents/Studia/1 semestr/4GL/Zadanie1/dane.csv', header = FALSE, sep = ' ')
+data <- read.csv('dane.csv', header = FALSE, sep = ' ')
 
 #przypisanie nazw kolumnom
 names(data) <- c("nauka_przedmiot", "l_powtorzen", "nauka_powiaz", "egz_powiaz", "egz_przedmiot", "wiedza")
@@ -64,7 +64,7 @@ library(class)
 #za³adowanie biblioteki do tworzenia CrossTable
 library(gmodels)
 
-#klasyfikacja za pomoca algorytmu knn, miara euklidesowa, k = 3
+#klasyfikacja za pomoca algorytmu knn, miara euklidesowa, k = 5
 knn.predict.euclides <- knn(train = train.data, test = test.data, cl = train.labels, k =5)
 
 #wyswietlenie uproszczonej tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
@@ -81,7 +81,7 @@ library(dprep)
 #za³adowanie biblioteki do tworzenia CrossTable
 library(gmodels)
 
-#klasyfikacja za pomoc¹ algorytmu knn, miara Gowera, k = 3
+#klasyfikacja za pomoc¹ algorytmu knn, miara Gowera, k = 7
 knn.predict.gower = knngow(train.data.labels, test.data, 7)
 
 #wyswietlenie uproszczonej tabelki informujacej o liczbie pokrywajacych sie wynikow klasyfikacji
@@ -112,17 +112,17 @@ showClassificationResults(bayes.predict, test.labels)
 
 ########## DRZEWO DECYZYJNE ##########
 
-#zaladowanie biblioteki do tworzenia modelu drzewa decyzyjnego
-library(rpart)
-
 #zaladowanie biblioteki do rysowania drzewa decyzyjnego
 library(rattle)
 
 #zaladowanie biblioteki do tabeli CrossTable
 library(gmodels)
 
+#zaladowanie biblioteki do tworzenia modelu drzewa decyzyjnego
+library(rpart)
+
 #budowanie drzewa decyzyjnego
-decision.tree.model <- rpart(wiedza ~ nauka_przedmiot + l_powtorzen + nauka_powiaz + egz_powiaz + egz_przedmiot, data = train.data.labels, method = "class")
+decision.tree.model <- rpart(wiedza ~., data = train.data.labels, method = "class")
 
 #tworzenie diagramu drzewa decyzyjnego
 fancyRpartPlot(decision.tree.model)
@@ -145,19 +145,16 @@ data <- rbind(data, c(0.1, 0.4, 0.3, 2.5,  4, "very_low"))
 data <- rbind(data, c(0.2, 0.3, 0.5, 3,  6, "very_low"))
 data <- rbind(data, c(0.8, 0.9, 0.7, 1.1,  2, "very_low"))
 
+#nalezy ponownie pomieszac dane, podzielic i przeprowadzic klasyfikacje algorytmami knn, bayes i drzewem decyzyjnym
 
-library(dbscan)
-data.lof <- lof(test[4], 3)
+################ Algorytm LOF #################
+library(Rlof)
+
+data$egz_powiaz <- as.numeric(data$egz_powiaz)
+data$egz_przedmiot <- as.numeric(data$egz_przedmiot)
+
+results_lof <- lof(data[4:5], 10)
 
 data.frame(data.lof)
 
-#przygotowanie danych
-library(Rlof)
-
-df <- data[1:5]
-df$nauka_przedmiot <- as.numeric(df$nauka_przedmiot)
-df$nauka_powiaz <- as.numeric(df$nauka_powiaz)
-df$egz_powiaz <- as.numeric(df$egz_powiaz)
-df$egz_przedmiot <- as.numeric(df$egz_przedmiot)
-df$l_powtorzen <- as.numeric(df$l_powtorzen)
-data.lof <- lof(df, 3)
+plot(results_lof, pch=19, xlab="Indeks", ylab="Wyniki algorytmu lof", col="blue")
