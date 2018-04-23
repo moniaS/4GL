@@ -30,6 +30,10 @@ plot(data, pch = 19, col = cluster.dbcan$cluster + 1L)
 cluster.agnes = agnes(data, method="average")
 plot(cluster.agnes, main="Dendogram")
 
-#wyœwietlanie danych z podzia³em na grupy
+#wyœwietlanie danych jako drzewo z podzia³em na grupy
 groups<-cutree(cluster.agnes, k=4)
 rect.hclust(cluster.agnes, k=4, border="red")
+
+#prezentacja danych pogrupowanych na wykresie
+nazwa <- rownames(data)
+ggplot(data, aes(egz_przedmiot, egz_powiaz, label=nazwa, color=abc)) + geom_point(size=3) + theme_bw() + coord_trans("sqrt", "sqrt")
