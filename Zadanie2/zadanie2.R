@@ -34,6 +34,10 @@ plot(cluster.agnes, main="Dendogram")
 groups<-cutree(cluster.agnes, k=4)
 rect.hclust(cluster.agnes, k=4, border="red")
 
+#wyœwietlenie ilosciowego podzialu na grupy
+numberOfElements <- table(groups)
+
 #prezentacja danych pogrupowanych na wykresie
 nazwa <- rownames(data)
-ggplot(data, aes(egz_przedmiot, egz_powiaz, label=nazwa, color=abc)) + geom_point(size=3) + theme_bw() + coord_trans("sqrt", "sqrt")
+group = factor(cutree(cluster.agnes, k=4))
+ggplot(data, aes(egz_powiaz, egz_przedmiot, label=nazwa, color=group)) + geom_point(size=3) + theme_bw() + coord_trans("sqrt", "sqrt")
