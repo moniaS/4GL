@@ -20,8 +20,8 @@ cluster.kmeans
 plot(data, pch = 19, col = cluster.kmeans$cluster)
 
 ######## ALGORYTM DBSCAN ##############
-kNNdistplot(data, k=9)
-cluster.dbcan <- dbscan(data, eps = 0.095, minPts = 9)
+kNNdistplot(data, k=4)
+cluster.dbcan <- dbscan(data, eps = 0.095, minPts = 4)
 cluster.dbcan
 plot(data, pch = 19, col = cluster.dbcan$cluster + 1L)
 
