@@ -23,7 +23,7 @@ install.packages("Rlof")
 library(Rlof)
 
 ######## ALGORYTM K-SREDNICH ###########
-cluster.kmeans <- kmeans(data, 4)
+cluster.kmeans <- kmeans(data, 8)
 cluster.kmeans
 plot(data, pch = 19, col = cluster.kmeans$cluster)
 
@@ -52,18 +52,18 @@ ggplot(data, aes(egz_powiaz, egz_przedmiot, label=nazwa, color=group)) + geom_po
 
 ######## DODANIE NIEPASUJ¥CYCH REKORDÓW #######
 
-data <- rbind(data, c(2,  10))
-data <- rbind(data, c(10,  8))
-data <- rbind(data, c(7,  14))
-data <- rbind(data, c(11, 3))
-data <- rbind(data, c(12,  6))
+data <- rbind(data, c(2,  8))
+data <- rbind(data, c(7,  7))
+data <- rbind(data, c(4,  7))
+data <- rbind(data, c(8, 3))
+data <- rbind(data, c(8,  5))
 
 ######## ALGORYTM LOF #######
 
 data$egz_powiaz <- as.numeric(data$egz_powiaz)
 data$egz_przedmiot <- as.numeric(data$egz_przedmiot)
 
-lof.results <- lof(data, 10)
+lof.results <- lof(data, 9)
 
 data.frame(lof.results)
 
@@ -105,11 +105,11 @@ cof <- function (data, k) {
 
 cof.results <- cof(data, 10)
 
-znajdz_wyjatki_cof <- function(cof_wartosci, prog_wyjatkowosci) {
+znajdz_wyjatki_cof <- function(cof_wartosci, prog_izolacji) {
   cof_wartosci_posortowane <- sort(cof_wartosci)
   cof_wartosc_maksymalna <- cof_wartosci_posortowane[length(cof_wartosci_posortowane)]
   cof_wyjatki <- c()
-  wartosc <- cof_wartosc_maksymalna - ((cof_wartosc_maksymalna - 1)/prog_wyjatkowosci)
+  wartosc <- cof_wartosc_maksymalna - ((cof_wartosc_maksymalna - 1)/prog_izolacji)
   for (i in 1: nrow(cof_wartosci)){
     if (cof_wartosci[i] > wartosc) {
       cof_wyjatki <- rbind(cof_wyjatki, c(cof_wartosci[i]))
@@ -118,7 +118,7 @@ znajdz_wyjatki_cof <- function(cof_wartosci, prog_wyjatkowosci) {
   return(cof_wyjatki)
 }
 
-cof.exceptions <- znajdz_wyjatki_cof(cof.results, 0.7)
+cof.exceptions <- znajdz_wyjatki_cof(cof.results, 0.83)
 
 plot(cof.results, pch=19, xlab="Indeks", ylab="Wyniki algorytmu cof", col="blue")
 
