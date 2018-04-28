@@ -1,7 +1,7 @@
 ######### PRZYGOTOWANIE DANYCH ##########
 
 #wczytanie danych
-data <- read.csv('C:/Users/Monia/Documents/Studia/1 semestr/4GL/Zadanie2/dane.csv', header = FALSE, sep = ' ')
+data <- read.csv('dane.csv', header = FALSE, sep = ' ')
 data <- data[4: 5]
 
 #przypisanie nazw kolumnom
@@ -21,6 +21,10 @@ library(cluster)
 #za³adowanie biblioteki do algorytmu LOF
 install.packages("Rlof")
 library(Rlof)
+
+#za³adowanie biblioteki do rysowania wykresu
+install.packages("ggplot2")
+library(ggplot2)
 
 ######## ALGORYTM K-SREDNICH ###########
 cluster.kmeans <- kmeans(data, 8)
@@ -52,11 +56,11 @@ ggplot(data, aes(egz_powiaz, egz_przedmiot, label=nazwa, color=group)) + geom_po
 
 ######## DODANIE NIEPASUJ¥CYCH REKORDÓW #######
 
-data <- rbind(data, c(2,  8))
-data <- rbind(data, c(7,  7))
-data <- rbind(data, c(4,  7))
+data <- rbind(data, c(2, 8))
+data <- rbind(data, c(7, 7))
+data <- rbind(data, c(4, 7))
 data <- rbind(data, c(8, 3))
-data <- rbind(data, c(8,  5))
+data <- rbind(data, c(8, 5))
 
 ######## ALGORYTM LOF #######
 
@@ -105,11 +109,11 @@ cof <- function (data, k) {
 
 cof.results <- cof(data, 10)
 
-znajdz_wyjatki_cof <- function(cof_wartosci, prog_izolacji) {
+znajdz_wyjatki_cof <- function(cof_wartosci, wspolczynnik_wyjatkowosci) {
   cof_wartosci_posortowane <- sort(cof_wartosci)
   cof_wartosc_maksymalna <- cof_wartosci_posortowane[length(cof_wartosci_posortowane)]
   cof_wyjatki <- c()
-  wartosc <- cof_wartosc_maksymalna - ((cof_wartosc_maksymalna - 1)/prog_izolacji)
+  wartosc <- cof_wartosc_maksymalna - ((cof_wartosc_maksymalna - 1)/wspolczynnik_wyjatkowosci)
   for (i in 1: nrow(cof_wartosci)){
     if (cof_wartosci[i] > wartosc) {
       cof_wyjatki <- rbind(cof_wyjatki, c(cof_wartosci[i]))
