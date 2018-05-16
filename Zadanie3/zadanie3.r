@@ -20,6 +20,10 @@ library(xlsx)
 install.packages("ggvis")
 library(ggvis)
 
+#za³adowanie biblioteki do obliczania funkcji przynale¿noœci
+install.packages("FuzzyR")
+library(FuzzyR)
+
 ######## OBLICZENIE ODLEGLOSCI #########
 
 distance.euclidean <- distance(data, method = "euclidean")
@@ -43,3 +47,28 @@ data %>% ggvis(~visited_resources, ~absence_days) %>% layer_points()
 
 #wyswietlenie wykresu prezentuj¹cego rozrzut danych dla atrybutów absence_days i topic
 data %>% ggvis(~absence_days, ~topic) %>% layer_points()
+
+####### OBLICZANIE FUNKCJI PRZYNALE¯NOŒCI ########
+
+#funkcja przynale¿noœci trójk¹tna dla atrybutu absence_days
+
+function.triangle.low <- genmf('trimf', c(0, 10, 30))
+triangle.low.values <- evalmf(data[,c(3)], function.triangle.low)
+
+function.triangle.medium <- genmf('trimf', c(25, 40, 70))
+triangle.medium.values <- evalmf(data[,c(3)], function.triangle.medium)
+
+function.triangle.high <- genmf('trimf', c(60, 80, 100))
+triangle.high.values <- evalmf(data[,c(3)], function.triangle.high)
+
+#funkcja przynale¿noœci trapezoidalna dla atrybutu visited_resources
+
+function.trapezoid.low <- genmf('trapmf', c(0, 10, 20, 30))
+trapezoid.low.values <- evalmf(data[,c(2)], function.trapezoid.low)
+
+function.triangle.medium <- genmf('trapmf', c(25, 40, 55, 70))
+triangle.medium.values <- evalmf(data[,c(3)], function.triangle.medium)
+
+function.triangle.high <- genmf('trapmf', c(60, 70, 85, 100))
+triangle.high.values <- evalmf(data[,c(3)], function.triangle.high)
+
