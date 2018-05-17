@@ -105,3 +105,13 @@ plotmf(function.trapezoid, "input", 1)
 #eksport wyników do Excela
 
 write.xlsx (x = as.data.frame(data), file = "results.xlsx")
+
+####### OBLICZANIE WSPÓ£CZYNNIKÓW ########
+
+#wspó³czynnik 1
+
+multiplied_medium_absence_and_low_visited_resources <- data$`medium absence days`* data$`low visited resources`
+sum <- sum(multiplied_medium_absence_and_low_visited_resources)
+factor.one <- 1/nrow(data) * sum
+
+
