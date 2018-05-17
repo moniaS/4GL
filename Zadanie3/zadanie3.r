@@ -112,6 +112,11 @@ write.xlsx (x = as.data.frame(data), file = "results.xlsx")
 
 multiplied_medium_absence_and_low_visited_resources <- data$`medium absence days`* data$`low visited resources`
 sum <- sum(multiplied_medium_absence_and_low_visited_resources)
-factor.one <- 1/nrow(data) * sum
+factor.one <- 1 / nrow(data) * sum
 
+#wspó³czynnik 2
 
+multiplied_low_absence_and_medium_visited_resources <- data$`low absence days`* data$`medium visited resources`
+sum <- sum(multiplied_low_absence_and_medium_visited_resources)
+sum.low.absence <- sum(data$`low absence days`)
+factor.two <- sum / sum.low.absence
