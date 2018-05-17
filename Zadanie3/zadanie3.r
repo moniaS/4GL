@@ -54,13 +54,16 @@ data %>% ggvis(~absence_days, ~topic) %>% layer_points()
 #funkcja przynale¿noœci trójk¹tna dla atrybutu absence_days
 
 function.triangle.low <- genmf('trimf', c(0, 0, 50))
-function.triangle.low.values <- evalmf(data[,c(3)], function.triangle.low)
+triangle.low.values <- evalmf(data[,c(3)], function.triangle.low)
+data[ , "low absence days"] <- triangle.low.values
 
 function.triangle.medium <- genmf('trimf', c(0, 50, 100))
 triangle.medium.values <- evalmf(data[,c(3)], function.triangle.medium)
+data[ , "medium absence days"] <- triangle.medium.values
 
 function.triangle.high <- genmf('trimf', c(50, 100, 100))
 triangle.high.values <- evalmf(data[,c(3)], function.triangle.high)
+data[ , "high absence days"] <- triangle.high.values
 
 #wykres funkcji przynale¿noœci dla atrybutu absence_days
 
@@ -74,16 +77,20 @@ plotmf(function.triangle, "input", 1)
 #funkcja przynale¿noœci trapezoidalna dla atrybutu visited_resources
 
 function.trapezoid.very_low <- genmf('trapmf', c(0, 0, 10, 25))
-trapezoid.low.values <- evalmf(data[,c(2)], function.trapezoid.very_low)
+trapezoid.very_low.values <- evalmf(data[,c(2)], function.trapezoid.very_low)
+data[ , "very low visited resources"] <- trapezoid.very_low.values
 
 function.trapezoid.low <- genmf('trapmf', c(10, 25, 40, 55))
 trapezoid.low.values <- evalmf(data[,c(2)], function.trapezoid.low)
+data[ , "low visited resources"] <- trapezoid.low.values
 
 function.trapezoid.medium <- genmf('trapmf', c(40, 55, 70, 85))
 trapezoid.medium.values <- evalmf(data[,c(2)], function.trapezoid.medium)
+data[ , "medium visited resources"] <- trapezoid.medium.values
 
 function.trapezoid.high <- genmf('trapmf', c(70, 85, 100, 100))
 trapezoid.high.values <- evalmf(data[,c(2)], function.trapezoid.high)
+data[ , "high visited resources"] <- trapezoid.high.values
 
 #wykres funkcji przynale¿noœci dla atrybutu visited_resources
 
@@ -94,3 +101,7 @@ function.trapezoid <- addmf(function.trapezoid, 'input', 1, 'niska', 'trapmf', c
 function.trapezoid <- addmf(function.trapezoid, 'input', 1, 'œrednia', 'trapmf', c(40, 55, 70, 85))
 function.trapezoid <- addmf(function.trapezoid, 'input', 1, 'wysoka', 'trapmf', c(70, 85, 100, 100))
 plotmf(function.trapezoid, "input", 1)
+
+#eksport wyników do Excela
+
+write.xlsx (x = as.data.frame(data), file = "results.xlsx")
