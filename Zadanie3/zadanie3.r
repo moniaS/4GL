@@ -35,7 +35,8 @@ write.xlsx (x = as.data.frame(distance.manhattan), file = "manhattan_results.xls
 distance.gower <- distance(data, method = "gower")
 write.xlsx (x = as.data.frame(distance.gower), file = "gower_results.xlsx")
 
-#DODAC CZWARTA MIARE
+distance.chord <- distance(data, method = "chord")
+write.xlsx (x = as.data.frame(distance.chord), file = "chord_results.xlsx")
 
 ######## ROZRZUT DANYCH #########
 
@@ -52,40 +53,44 @@ data %>% ggvis(~absence_days, ~topic) %>% layer_points()
 
 #funkcja przynale¿noœci trójk¹tna dla atrybutu absence_days
 
-function.triangle.low <- genmf('trimf', c(0, 0, 30))
+function.triangle.low <- genmf('trimf', c(0, 0, 50))
 function.triangle.low.values <- evalmf(data[,c(3)], function.triangle.low)
 
-function.triangle.medium <- genmf('trimf', c(25, 40, 70))
+function.triangle.medium <- genmf('trimf', c(0, 50, 100))
 triangle.medium.values <- evalmf(data[,c(3)], function.triangle.medium)
 
-function.triangle.high <- genmf('trimf', c(60, 100, 100))
+function.triangle.high <- genmf('trimf', c(50, 100, 100))
 triangle.high.values <- evalmf(data[,c(3)], function.triangle.high)
 
 #wykres funkcji przynale¿noœci dla atrybutu absence_days
 
 function.triangle <- newfis('tipper')
 function.triangle <- addvar(function.triangle, 'input', 'absence_days', c(0, 100))
-function.triangle <- addmf(function.triangle, 'input', 1, 'niska', 'trimf', c(0, 0, 35))
-function.triangle <- addmf(function.triangle, 'input', 1, 'œrednia', 'trimf', c(25, 40, 70))
-function.triangle <- addmf(function.triangle, 'input', 1, 'wysoka', 'trimf', c(60, 100, 100))
+function.triangle <- addmf(function.triangle, 'input', 1, 'niska', 'trimf', c(0, 0, 50))
+function.triangle <- addmf(function.triangle, 'input', 1, 'œrednia', 'trimf', c(0, 50, 100))
+function.triangle <- addmf(function.triangle, 'input', 1, 'wysoka', 'trimf', c(50, 100, 100))
 plotmf(function.triangle, "input", 1)
 
 #funkcja przynale¿noœci trapezoidalna dla atrybutu visited_resources
 
-function.trapezoid.low <- genmf('trapmf', c(0, 10, 20, 30))
+function.trapezoid.very_low <- genmf('trapmf', c(0, 0, 10, 25))
+trapezoid.low.values <- evalmf(data[,c(2)], function.trapezoid.very_low)
+
+function.trapezoid.low <- genmf('trapmf', c(10, 25, 40, 55))
 trapezoid.low.values <- evalmf(data[,c(2)], function.trapezoid.low)
 
-function.triangle.medium <- genmf('trapmf', c(25, 40, 55, 70))
-triangle.medium.values <- evalmf(data[,c(3)], function.triangle.medium)
+function.trapezoid.medium <- genmf('trapmf', c(40, 55, 70, 85))
+trapezoid.medium.values <- evalmf(data[,c(2)], function.trapezoid.medium)
 
-function.triangle.high <- genmf('trapmf', c(60, 70, 85, 100))
-triangle.high.values <- evalmf(data[,c(3)], function.triangle.high)
+function.trapezoid.high <- genmf('trapmf', c(70, 85, 100, 100))
+trapezoid.high.values <- evalmf(data[,c(2)], function.trapezoid.high)
 
 #wykres funkcji przynale¿noœci dla atrybutu visited_resources
 
 function.trapezoid <- newfis('tipper')
 function.trapezoid <- addvar(function.trapezoid, 'input', 'visited_resources', c(0, 100))
-function.trapezoid <- addmf(function.trapezoid, 'input', 1, 'niska', 'trapmf', c(0, 0, 20, 40))
-function.trapezoid <- addmf(function.trapezoid, 'input', 1, 'œrednia', 'trapmf', c(25, 40, 55, 70))
-function.trapezoid <- addmf(function.trapezoid, 'input', 1, 'wysoka', 'trapmf', c(55, 70, 100, 100))
+function.trapezoid <- addmf(function.trapezoid, 'input', 1, 'bardzo niska', 'trapmf', c(0, 0, 10, 25))
+function.trapezoid <- addmf(function.trapezoid, 'input', 1, 'niska', 'trapmf', c(10, 25, 40, 55))
+function.trapezoid <- addmf(function.trapezoid, 'input', 1, 'œrednia', 'trapmf', c(40, 55, 70, 85))
+function.trapezoid <- addmf(function.trapezoid, 'input', 1, 'wysoka', 'trapmf', c(70, 85, 100, 100))
 plotmf(function.trapezoid, "input", 1)
