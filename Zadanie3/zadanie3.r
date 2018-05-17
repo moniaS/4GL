@@ -4,7 +4,7 @@
 #wczytanie danych
 data <- read.csv('C:/Users/Monia/Documents/Studia/1 semestr/4GL/Zadanie3/dane.csv', header = TRUE, sep = ',')
 data <- data[c(7,11,12)]
-names(data) <- c("topic", "visited_resources", "absence_days")
+names(data) <- c("topic", "visited_resources", "announcements_view")
 
 ######## ZALADOWANIE PAKIETOW ##########
 
@@ -27,48 +27,48 @@ library(FuzzyR)
 ######## OBLICZENIE ODLEGLOSCI #########
 
 distance.euclidean <- distance(data, method = "euclidean")
-write.xlsx (x = as.data.frame(distance.euclidean), file = "euclidean_results.xlsx")
+write.xlsx (x = distance.euclidean[,1], file = "euclidean_results.xlsx")
 
-distance.manhattan<- distance(data, method = "manhattan")
-write.xlsx (x = as.data.frame(distance.manhattan), file = "manhattan_results.xlsx")
+distance.manhattan <- distance(data, method = "manhattan")
+write.xlsx (x = distance.manhattan[,1], file = "manhattan_results.xlsx")
 
 distance.gower <- distance(data, method = "gower")
-write.xlsx (x = as.data.frame(distance.gower), file = "gower_results.xlsx")
+write.xlsx (x = distance.gower[,1], file = "gower_results.xlsx")
 
 distance.chord <- distance(data, method = "chord")
-write.xlsx (x = as.data.frame(distance.chord), file = "chord_results.xlsx")
+write.xlsx (x = distance.chord[,1], file = "chord_results.xlsx")
 
 ######## ROZRZUT DANYCH #########
 
 #wyswietlenie wykresu prezentuj¹cego rozrzut danych dla atrybutów visited_resources i topic
 data %>% ggvis(~visited_resources, ~topic) %>% layer_points()
 
-#wyswietlenie wykresu prezentuj¹cego rozrzut danych dla atrybutów visited_resources i absence_days
-data %>% ggvis(~visited_resources, ~absence_days) %>% layer_points()
+#wyswietlenie wykresu prezentuj¹cego rozrzut danych dla atrybutów visited_resources i announcements_view
+data %>% ggvis(~visited_resources, ~announcements_view) %>% layer_points()
 
-#wyswietlenie wykresu prezentuj¹cego rozrzut danych dla atrybutów absence_days i topic
-data %>% ggvis(~absence_days, ~topic) %>% layer_points()
+#wyswietlenie wykresu prezentuj¹cego rozrzut danych dla atrybutów announcements_view i topic
+data %>% ggvis(~announcements_view, ~topic) %>% layer_points()
 
 ####### OBLICZANIE FUNKCJI PRZYNALE¯NOŒCI ########
 
-#funkcja przynale¿noœci trójk¹tna dla atrybutu absence_days
+#funkcja przynale¿noœci trójk¹tna dla atrybutu announcements_view
 
 function.triangle.low <- genmf('trimf', c(0, 0, 50))
 triangle.low.values <- evalmf(data[,c(3)], function.triangle.low)
-data[ , "low absence days"] <- triangle.low.values
+data[ , "low announcements view"] <- triangle.low.values
 
 function.triangle.medium <- genmf('trimf', c(0, 50, 100))
 triangle.medium.values <- evalmf(data[,c(3)], function.triangle.medium)
-data[ , "medium absence days"] <- triangle.medium.values
+data[ , "medium announcements view"] <- triangle.medium.values
 
 function.triangle.high <- genmf('trimf', c(50, 100, 100))
 triangle.high.values <- evalmf(data[,c(3)], function.triangle.high)
-data[ , "high absence days"] <- triangle.high.values
+data[ , "high announcements view"] <- triangle.high.values
 
-#wykres funkcji przynale¿noœci dla atrybutu absence_days
+#wykres funkcji przynale¿noœci dla atrybutu announcements_view
 
 function.triangle <- newfis('tipper')
-function.triangle <- addvar(function.triangle, 'input', 'absence_days', c(0, 100))
+function.triangle <- addvar(function.triangle, 'input', 'announcements_view', c(0, 100))
 function.triangle <- addmf(function.triangle, 'input', 1, 'niska', 'trimf', c(0, 0, 50))
 function.triangle <- addmf(function.triangle, 'input', 1, 'œrednia', 'trimf', c(0, 50, 100))
 function.triangle <- addmf(function.triangle, 'input', 1, 'wysoka', 'trimf', c(50, 100, 100))
@@ -110,13 +110,13 @@ write.xlsx (x = as.data.frame(data), file = "results.xlsx")
 
 #wspó³czynnik 1
 
-multiplied_medium_absence_and_low_visited_resources <- data$`medium absence days`* data$`low visited resources`
-sum <- sum(multiplied_medium_absence_and_low_visited_resources)
+multiplied_medium_announcements_view_and_low_visited_resources <- data$`medium announcements view`* data$`low visited resources`
+sum <- sum(multiplied_medium_announcements_view_and_low_visited_resources)
 factor.one <- 1 / nrow(data) * sum
 
 #wspó³czynnik 2
 
-multiplied_low_absence_and_medium_visited_resources <- data$`low absence days`* data$`medium visited resources`
-sum <- sum(multiplied_low_absence_and_medium_visited_resources)
-sum.low.absence <- sum(data$`low absence days`)
-factor.two <- sum / sum.low.absence
+multiplied_low_announcements_view_and_medium_visited_resources <- data$`low announcements view`* data$`medium visited resources`
+sum <- sum(multiplied_low_announcements_view_and_medium_visited_resources)
+sum.low.announcements_view <- sum(data$`low announcements view`)
+factor.two <- sum / sum.low.announcements_view
