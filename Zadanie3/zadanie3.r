@@ -128,7 +128,7 @@ function.gauss.very_high <- genmf('gaussmf', c(1.5, 100))
 gauss.very_high.values <- evalmf(data[,c(4)], function.gauss.very_high)
 data[ , "very high discussion"] <- gauss.very_high.values
 
-#wykres funkcji przynale¿noœci dla atrybutu announcements_view
+#wykres funkcji przynale¿noœci dla atrybutu discussion
 
 function.gauss <- newfis('tipper')
 function.gauss <- addvar(function.gauss, 'input', 'discussion', c(0, 100))
