@@ -24,6 +24,10 @@ library(ggvis)
 install.packages("FuzzyR")
 library(FuzzyR)
 
+#za³adowanie biblioteki do obliczania cardinality
+install.packages("nsprcomp")
+library(nsprcomp)
+
 ######## OBLICZENIE ODLEGLOSCI #########
 
 distance.euclidean <- distance(data, method = "euclidean")
@@ -153,3 +157,9 @@ multiplied_low_announcements_view_and_medium_visited_resources <- data$`low anno
 sum <- sum(multiplied_low_announcements_view_and_medium_visited_resources)
 sum.low.announcements_view <- sum(data$`low announcements view`)
 factor.two <- sum / sum.low.announcements_view
+
+#wspó³czynnik 3
+
+card.non.zero.elem <- cardinality(data$`high announcements view`)
+card.all.elem <- nrow(data)
+factor.three <- card.non.zero.elem / card.all.elem
