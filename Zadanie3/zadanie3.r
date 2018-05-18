@@ -3,8 +3,8 @@
 
 #wczytanie danych
 data <- read.csv('C:/Users/Monia/Documents/Studia/1 semestr/4GL/Zadanie3/dane.csv', header = TRUE, sep = ',')
-data <- data[c(7,11,12)]
-names(data) <- c("topic", "visited_resources", "announcements_view")
+data <- data[c(7,11,12,13)]
+names(data) <- c("topic", "visited_resources", "announcements_view", "discussion")
 
 ######## ZALADOWANIE PAKIETOW ##########
 
@@ -101,6 +101,39 @@ function.trapezoid <- addmf(function.trapezoid, 'input', 1, 'niska', 'trapmf', c
 function.trapezoid <- addmf(function.trapezoid, 'input', 1, 'œrednia', 'trapmf', c(40, 55, 70, 85))
 function.trapezoid <- addmf(function.trapezoid, 'input', 1, 'wysoka', 'trapmf', c(70, 85, 100, 100))
 plotmf(function.trapezoid, "input", 1)
+
+#funkcja przynale¿noœci gaussa dla atrybutu discussion
+
+function.gauss.very_low <- genmf('gaussmf', c(1.5, 0))
+gauss.very_low.values <- evalmf(data[,c(4)], function.gauss.very_low)
+data[ , "very low discussion"] <- gauss.very_low.values
+
+function.gauss.low <- genmf('gaussmf', c(1.5, 25))
+gauss.low.values <- evalmf(data[,c(4)], function.gauss.low)
+data[ , "low discussion"] <- gauss.low.values
+
+function.gauss.medium <- genmf('gaussmf', c(1.5, 50))
+gauss.medium.values <- evalmf(data[,c(4)], function.gauss.medium)
+data[ , "medium discussion"] <- gauss.medium.values
+
+function.gauss.high <- genmf('gaussmf', c(1.5, 75))
+gauss.high.values <- evalmf(data[,c(4)], function.gauss.high)
+data[ , "high discussion"] <- gauss.high.values
+
+function.gauss.very_high <- genmf('gaussmf', c(1.5, 100))
+gauss.very_high.values <- evalmf(data[,c(4)], function.gauss.very_high)
+data[ , "very high discussion"] <- gauss.very_high.values
+
+#wykres funkcji przynale¿noœci dla atrybutu announcements_view
+
+function.gauss <- newfis('tipper')
+function.gauss <- addvar(function.gauss, 'input', 'discussion', c(0, 100))
+function.gauss <- addmf(function.gauss, 'input', 1, 'bardzo niska', 'gaussmf', c(8, 0))
+function.gauss <- addmf(function.gauss, 'input', 1, 'niska', 'gaussmf', c(8, 25))
+function.gauss <- addmf(function.gauss, 'input', 1, 'œrednia', 'gaussmf', c(8, 50))
+function.gauss <- addmf(function.gauss, 'input', 1, 'wysoka', 'gaussmf', c(8, 75))
+function.gauss <- addmf(function.gauss, 'input', 1, 'bardzo wysoka', 'gaussmf', c(8, 100))
+plotmf(function.gauss, "input", 1)
 
 #eksport wyników do Excela
 
