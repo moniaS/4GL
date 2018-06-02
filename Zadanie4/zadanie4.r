@@ -37,6 +37,10 @@ library(AnomalyDetection)
 install.packages("tsoutliers")
 library(tsoutliers)
 
+#za³adowanie biblioteki hdrcde
+install.packages("hdrcde")
+library(hdrcde)
+
 ######## GRUPOWANIE ZBIORU NR 1 ##########
 data.gaz.clust <- tsclust(data.gaz.timeseries, k = 4, type = "hierarchical", distance = "DTW",
                                    seed = 3247)
@@ -79,7 +83,14 @@ anomalie.inflacja <- AnomalyDetectionTs(data.inflacja, max_anoms=0.05, direction
 anomalie.inflacja
 
 
-######## TsOutliers ##############
+############## TsOutliers ###############
+
 gaz.ts <- ts(data.gaz[,2], frequency=1)
 gaz.outliers <- tso(gaz.ts)
 plot(gaz.outliers)
+
+############### Hdrcde ##################
+
+#data w data.gaz musi byc uprzednio sformatowana
+hdrcde.gaz <- cde(data.gaz[,1], data.gaz[,2])
+plot(hdrcde.gaz, xlab="Date", ylab="Price")
