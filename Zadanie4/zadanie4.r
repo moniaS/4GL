@@ -28,6 +28,15 @@ library(dtwclust)
 install.packages("xts")
 library(xts)
 
+#za³adowanie biblioteki do Twitter’s AnomalyDetection
+install.packages("devtools")
+devtools::install_github("twitter/AnomalyDetection")
+library(AnomalyDetection)
+
+#za³adowanie biblioteki do tsoutliers
+install.packages("tsoutliers")
+library(tsoutliers)
+
 ######## GRUPOWANIE ZBIORU NR 1 ##########
 data.gaz.clust <- tsclust(data.gaz.timeseries, k = 4, type = "hierarchical", distance = "DTW",
                                    seed = 3247)
@@ -55,16 +64,12 @@ plot(data.inflacja.clust, clus = seq_len(x@k), plot = TRUE, type = "dendrogram")
 
 ######## Twitter’s AnomalyDetection ###########
 
-install.packages("devtools")
-devtools::install_github("twitter/AnomalyDetection")
-library(AnomalyDetection)
-
 #przyklad dla zbioru danych cen gazu 
 data.gaz <- read.csv('D:/Studia - prace/2-stopien/4GL/repository/4GL/Zadanie4/gaz-dziennie.csv', header = TRUE, sep = ',')
 data.gaz$Date <- as.POSIXct(strptime(data.gaz$Date, "%Y-%m-%d", tz = "UTC"))
 #wybor przedzialu danych dla bardziej przejrzystego wyniku
 data.gaz <- data.gaz[900:1100,]
-anomalie.gaz <- AnomalyDetectionTs(data.gaz, max_anoms=0.5, direction='both', plot=TRUE)
+anomalie.gaz <- AnomalyDetectionTs(data.gaz, max_anoms=0.05, direction='both', plot=TRUE)
 anomalie.gaz
 
 #kolejny przyklad dla innego zbioru danych
@@ -72,3 +77,9 @@ data.inflacja <- read.csv('D:/Studia - prace/2-stopien/4GL/repository/4GL/Zadani
 data.inflacja$Date <- as.POSIXct(strptime(data.inflacja$Date, "%Y-%m-%d", tz = "UTC"))
 anomalie.inflacja <- AnomalyDetectionTs(data.inflacja, max_anoms=0.05, direction='both', plot=TRUE)
 anomalie.inflacja
+
+
+######## TsOutliers ##############
+gaz.ts <- ts(data.gaz[,2], frequency=1)
+gaz.outliers <- tso(gaz.ts)
+plot(gaz.outliers)
