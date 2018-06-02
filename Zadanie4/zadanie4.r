@@ -11,8 +11,12 @@ data.inflacja <- read.csv('D:/Studia - prace/2-stopien/4GL/repository/4GL/Zadani
 
 data.gaz$Price <- as.numeric(as.character(data.gaz$Price))
 data.gaz$Date <- as.Date(as.character(data.gaz$Date))
-
 data.gaz.timeseries <- as.xts(data.gaz[,-1], order.by = data.gaz$Date)
+
+data.inflacja <- data.inflacja[1:200,]
+data.inflacja$Value <- as.numeric(as.character(data.inflacja$Value))
+data.inflacja$Date <- as.Date(as.character(data.inflacja$Date))
+data.inflacja.timeseries <- as.xts(data.inflacja[,-1], order.by = data.inflacja$Date)
 
 ######## ZA£ADOWANIE PAKIETÓW ##########
 
@@ -24,9 +28,22 @@ library(dtwclust)
 install.packages("xts")
 library(xts)
 
-######## GRUPOWANIE ##########
+######## GRUPOWANIE ZBIORU NR 1 ##########
 
-data.gaz.clust <- tsclust(data.gaz.timeseries, type = "partitional", k = 10L, 
-              distance = "euclidean", centroid = "pam", seed = 3247L, trace = TRUE)
+data.gaz.clust <- tsclust(data.gaz.timeseries, k = 4, type = "hierarchical", distance = "DTW",
+                                   seed = 3247)
 
-plot(data.gaz.clust)
+plot(data.gaz.clust@cluster)
+
+plot(data.gaz.clust, clus = seq_len(x@k), plot = TRUE, type = "dendrogram")
+
+######## GRUPOWANIE ZBIORU NR 2 ##########
+
+data.inflacja.clust <- tsclust(data.inflacja.timeseries, k = 3, type = "hierarchical", distance = "DTW",
+                          seed = 3247)
+
+plot(data.inflacja.clust@cluster)
+
+plot(data.inflacja.clust, clus = seq_len(x@k), plot = TRUE, type = "dendrogram")
+
+
