@@ -8,6 +8,10 @@ library(magick)
 # wczytanie obrazka
 
 shrek<-image_read('https://vignette.wikia.nocookie.net/deathbattlefanon/images/c/ce/Shrek_clipart4.png/revision/latest?cb=20140813064239')
+t³o<-image_read('https://i.imgur.com/CuShj4j.jpg')
+osio³<-image_read('https://pl.seaicons.com/wp-content/uploads/2015/07/Donkey-2-icon.png')
+fiona <- image_read('http://icons.iconarchive.com/icons/majdi-khawaja/shrek/256/Fiona-3-icon.png')
+
 print(shrek)
 image_info(shrek)
 image_comment(shrek, "Obrazek Shreka")
@@ -25,6 +29,14 @@ shrek_jpg <- image_convert(shrek, "jpg")
 
 # skalowanie wzglêdem szerkoœci 
 shrek <- image_scale(shrek, "200")
+osio³ <- image_scale(osio³, "150")
+fiona <- image_scale(fiona, "x160")
+
+# skalowanie wzglêdem szerkoœci 
+t³o <- image_scale(t³o, "400")
+
+# skalowanie wzglêdem szerkoœci 
+fiona <- image_scale(fiona, "x200")
 
 # wyciêcie czêœci obrazka
 image_crop(shrek, "60x80+70")
@@ -75,3 +87,15 @@ image_colorize(shrek, 20, "red")
 # zast¹pienie pikseli z najbli¿szego s¹siedztwa
 image_median(shrek, radius = 5)
 
+############# KOMPOZYCJA ################
+
+# kompozycja obrazków
+img <- image_composite(t³o, shrek, offset = "+0+50")
+img <- image_composite(img, osio³, offset = "+250+80")
+img <- image_composite(img, fiona, offset = "+150+60")
+
+# dodanie obramowania
+image_write(image_border(img, "green", "20x10"), "shrek_border.png")
+
+# dodanie ramki
+image_write(image_frame(img, "brown"), "shrek_frame.png")
