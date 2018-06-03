@@ -3,21 +3,6 @@
 #https://datahub.io/core/natural-gas#resource-natural-gas-monthly
 #www.quandl.com/api/v3/datasets/RATEINF/INFLATION_USA.csv?api_key=UWs93ZbpqbCoD68gg6zx
 
-
-#wczytanie danych
-#data <- read.csv('C:/Users/Monia/Documents/Studia/1 semestr/4GL/Zadanie4/dane.csv', header = TRUE, sep = ',')
-data.gaz <- read.csv('D:/Studia - prace/2-stopien/4GL/repository/4GL/Zadanie4/gaz.csv', header = TRUE, sep = ',')
-data.inflacja <- read.csv('D:/Studia - prace/2-stopien/4GL/repository/4GL/Zadanie4/inflacja.csv', header = TRUE, sep = ',')
-
-data.gaz$Price <- as.numeric(as.character(data.gaz$Price))
-data.gaz$Date <- as.Date(as.character(data.gaz$Date))
-data.gaz.timeseries <- as.xts(data.gaz[,-1], order.by = data.gaz$Date)
-
-data.inflacja <- data.inflacja[1:300,]
-data.inflacja$Value <- as.numeric(as.character(data.inflacja$Value))
-data.inflacja$Date <- as.Date(as.character(data.inflacja$Date))
-data.inflacja.timeseries <- as.xts(data.inflacja[,-1], order.by = data.inflacja$Date)
-
 ######## ZA£ADOWANIE PAKIETÓW ##########
 
 #za³adowanie biblioteki do grupowania
@@ -41,7 +26,25 @@ library(tsoutliers)
 install.packages("hdrcde")
 library(hdrcde)
 
+########### WCZYTANIE DANYCH ############
+
+#data <- read.csv('C:/Users/Monia/Documents/Studia/1 semestr/4GL/Zadanie4/dane.csv', header = TRUE, sep = ',')
+data.gaz <- read.csv('D:/Studia - prace/2-stopien/4GL/repository/4GL/Zadanie4/gaz.csv', header = TRUE, sep = ',')
+data.inflacja <- read.csv('D:/Studia - prace/2-stopien/4GL/repository/4GL/Zadanie4/inflacja.csv', header = TRUE, sep = ',')
+
+####### PRZYGOTOWANIE DANYCH ############
+
+data.gaz$Price <- as.numeric(as.character(data.gaz$Price))
+data.gaz$Date <- as.Date(as.character(data.gaz$Date))
+data.gaz.timeseries <- as.xts(data.gaz[,-1], order.by = data.gaz$Date)
+
+data.inflacja <- data.inflacja[1:300,]
+data.inflacja$Value <- as.numeric(as.character(data.inflacja$Value))
+data.inflacja$Date <- as.Date(as.character(data.inflacja$Date))
+data.inflacja.timeseries <- as.xts(data.inflacja[,-1], order.by = data.inflacja$Date)
+
 ######## GRUPOWANIE ZBIORU NR 1 ##########
+
 data.gaz.clust <- tsclust(data.gaz.timeseries, k = 4, type = "hierarchical", distance = "DTW",
                                    seed = 3247)
 plot(data.gaz.timeseries, xlab="Data", ylab="Cena")
@@ -73,15 +76,14 @@ data.gaz <- read.csv('D:/Studia - prace/2-stopien/4GL/repository/4GL/Zadanie4/ga
 data.gaz$Date <- as.POSIXct(strptime(data.gaz$Date, "%Y-%m-%d", tz = "UTC"))
 #wybor przedzialu danych dla bardziej przejrzystego wyniku
 data.gaz <- data.gaz[900:1100,]
-anomalie.gaz <- AnomalyDetectionTs(data.gaz, max_anoms=0.05, direction='both', plot=TRUE)
+anomalie.gaz <- AnomalyDetectionTs(data.gaz, max_anoms=0.05, direction='both', plot=TRUE, ylab="Price", xlab="Date")
 anomalie.gaz
 
 #kolejny przyklad dla innego zbioru danych
 data.inflacja <- read.csv('D:/Studia - prace/2-stopien/4GL/repository/4GL/Zadanie4/inflacja.csv', header = TRUE, sep = ',')
 data.inflacja$Date <- as.POSIXct(strptime(data.inflacja$Date, "%Y-%m-%d", tz = "UTC"))
-anomalie.inflacja <- AnomalyDetectionTs(data.inflacja, max_anoms=0.05, direction='both', plot=TRUE)
+anomalie.inflacja <- AnomalyDetectionTs(data.inflacja, max_anoms=0.05, direction='both', plot=TRUE, ylab="Values", xlab="Date")
 anomalie.inflacja
-
 
 ############## TsOutliers ###############
 
@@ -92,5 +94,5 @@ plot(gaz.outliers)
 ############### Hdrcde ##################
 
 #data w data.gaz musi byc uprzednio sformatowana
-hdrcde.gaz <- cde(data.gaz[,1], data.gaz[,2])
-plot(hdrcde.gaz, xlab="Date", ylab="Price")
+cde.gaz <- cde(data.gaz$Date,data.gaz$Price, x.name="Date", y.name="Price")
+plot(cde.gaz, plot.fn="hdr")
