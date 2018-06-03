@@ -8,6 +8,9 @@ library(magick)
 # wczytanie obrazka
 
 shrek<-image_read('https://vignette.wikia.nocookie.net/deathbattlefanon/images/c/ce/Shrek_clipart4.png/revision/latest?cb=20140813064239')
+shrek_2<-image_read('https://vignette.wikia.nocookie.net/fantendo/images/9/9c/Shrek-PNG-File.png/revision/latest?cb=20170228010750')
+shrek_3<-image_read('http://pngimg.com/uploads/shrek/shrek_PNG34.png')
+gif<-image_read('https://media.giphy.com/media/G78JNWI04lXqM/source.gif')
 t³o<-image_read('https://i.imgur.com/CuShj4j.jpg')
 osio³<-image_read('https://pl.seaicons.com/wp-content/uploads/2015/07/Donkey-2-icon.png')
 fiona <- image_read('http://icons.iconarchive.com/icons/majdi-khawaja/shrek/256/Fiona-3-icon.png')
@@ -29,6 +32,8 @@ shrek_jpg <- image_convert(shrek, "jpg")
 
 # skalowanie wzglêdem szerkoœci 
 shrek <- image_scale(shrek, "200")
+shrek_2 <- image_scale(shrek_2, "200")
+shrek_3 <- image_scale(shrek_3, "200")
 osio³ <- image_scale(osio³, "150")
 fiona <- image_scale(fiona, "x160")
 
@@ -99,3 +104,14 @@ image_write(image_border(img, "green", "20x10"), "shrek_border.png")
 
 # dodanie ramki
 image_write(image_frame(img, "brown"), "shrek_frame.png")
+
+############# ANIMACJE ################
+
+shreks <- image_scale(c(shrek, shrek_2, shrek_3), "200")
+
+image_animate(image_morph(shreks, 10))
+
+image_animate(image_montage(shreks))
+
+
+
